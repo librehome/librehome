@@ -1,0 +1,18 @@
+{
+    "developer": "SmartonLabs",
+    "docsVersion": "20201006.213907.514.11",
+    "documents": [
+        {
+            "locale": "en",
+            "version": "20200826.20603.303.2"
+        },
+        {
+            "locale": "zh_Hans",
+            "version": "20200826.20749.262.7"
+        }
+    ],
+    "file": "LibreSprinkler",
+    "lang": "lua",
+    "signatureVersion": "20201006.213907.512.10",
+    "version": "20201006.213859.95.8"
+}
