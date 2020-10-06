@@ -1,0 +1,18 @@
+{
+    "developer": "SmartonLabs",
+    "docsVersion": "20201006.214046.37.19",
+    "documents": [
+        {
+            "locale": "en",
+            "version": "20200826.20620.238.3"
+        },
+        {
+            "locale": "zh_Hans",
+            "version": "20200826.20755.84.8"
+        }
+    ],
+    "file": "LibreThermostat",
+    "lang": "lua",
+    "signatureVersion": "20201006.214046.35.18",
+    "version": "20201006.214035.808.16"
+}
