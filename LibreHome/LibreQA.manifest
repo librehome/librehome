@@ -1,0 +1,14 @@
+{
+    "developer": "LibreHome",
+    "docsVersion": "20201006.213939.925.15",
+    "documents": [
+        {
+            "locale": "en",
+            "version": "20201004.212810.125.1"
+        }
+    ],
+    "file": "LibreQA",
+    "lang": "lua",
+    "signatureVersion": "20201006.213939.921.14",
+    "version": "20201006.213929.285.12"
+}
