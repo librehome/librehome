@@ -1,6 +1,6 @@
 {
     "developer": "SmartonLabs",
-    "docsVersion": "20200930.202727.2.7",
+    "docsVersion": "20201010.22407.879.3",
     "documents": [
         {
             "locale": "en",
@@ -13,6 +13,6 @@
     ],
     "file": "LibreDenonAVR",
     "lang": "lua",
-    "signatureVersion": "20200930.202726.998.6",
-    "version": "20200930.202706.732.4"
+    "signatureVersion": "20201010.22407.876.2",
+    "version": "20201010.22204.263.0"
 }
