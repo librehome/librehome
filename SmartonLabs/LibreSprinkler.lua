@@ -1,4 +1,5 @@
 -- Copyright 2015-2020 Smartonlabs Inc
+-- All Right Reserved
 -- Released under MIT License
 -- https://opensource.org/licenses/MIT
 local pairs = pairs
