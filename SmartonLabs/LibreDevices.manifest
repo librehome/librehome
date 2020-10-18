@@ -1,0 +1,18 @@
+{
+    "developer": "SmartonLabs",
+    "docsVersion": "20200828.162418.256.40",
+    "documents": [
+        {
+            "locale": "en",
+            "version": "20200828.10020.46.9"
+        },
+        {
+            "locale": "zh_Hans",
+            "version": "20200828.10515.913.10"
+        }
+    ],
+    "file": "LibreDevices",
+    "lang": "lua",
+    "signatureVersion": "20200828.162418.253.39",
+    "version": "20200828.162408.22.37"
+}
