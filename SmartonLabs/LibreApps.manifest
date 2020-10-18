@@ -1,0 +1,18 @@
+{
+    "developer": "SmartonLabs",
+    "docsVersion": "20201006.213803.357.3",
+    "documents": [
+        {
+            "locale": "en",
+            "version": "20200829.1111.694.0"
+        },
+        {
+            "locale": "zh_Hans",
+            "version": "20200826.20734.597.5"
+        }
+    ],
+    "file": "LibreApps",
+    "lang": "lua",
+    "signatureVersion": "20201006.213803.354.2",
+    "version": "20201006.213651.403.0"
+}
