@@ -1,3 +1,7 @@
+-- Copyright 2015-2020 Smartonlabs Inc
+-- Released under MIT License
+-- https://opensource.org/licenses/MIT
+-- Latest version: 20201023
 local pairs = pairs
 local ipairs = ipairs
 local floor = math.floor
@@ -376,14 +380,16 @@ function FlexLevel(virtualDevice, onActions, offActions, stateDevice)
 			local cluster = e.c
 			if cluster == ZCL_CLUSTER_ID_GEN_LEVEL_CONTROL then
 				if e.id == stateDevice then
-					local affectedAttributes = e.a
-					if affectedAttributes ~= nil then 
-						local level = affectedAttributes[ATTRID_LEVEL_CURRENT_LEVEL]
-						if level ~= nil then
-							curLevel = level
-							Libre_VirtualDeviceLevelReport(virtualDevice, curLevel, e.s)
-						end
-					end					
+					if e.ok then
+						local affectedAttributes = e.a
+						if affectedAttributes ~= nil then 
+							local level = affectedAttributes[ATTRID_LEVEL_CURRENT_LEVEL]
+							if level ~= nil then
+								curLevel = level
+								Libre_VirtualDeviceLevelReport(virtualDevice, curLevel, e.s)
+							end
+						end	
+					end
 				elseif e.id == virtualDevice then
 					if e.t == EV_TYPE_DEVICE_CMD then
 						local cmd = e.d
