@@ -134,11 +134,15 @@ function ThermostatSchedule(scheduleTable, thermostats)
 		local nextTriggerTime, nextAction, schedule = getNextAction(
 			scheduleTable, prevDay, prevTimeOfDay)
 		Libre_WaitUntil(nextTriggerTime)
-		debugLog(string.format("Trigger action %s:%s",
-				schedule.name, nextAction.name))
+		-- debugLog(string.format("Trigger action %s:%s",
+		--		schedule.name, nextAction.name))
+		-- debugLog(string.format("Set temp heat=%f, cool=%f",
+		--		nextAction.heat, nextAction.cool))
+		
 		-- Set heat and cool setpoints to list of thermostats
 		local heat = floor(nextAction.heat * 100)
 		local cool = floor(nextAction.cool * 100)
+	
 		local attributes = {
 			[ATTRID_HVAC_THERMOSTAT_SYSTEM_MODE] = HVAC_THERMOSTAT_SYSTEM_MODE_AUTO,
 			[ATTRID_HVAC_THERMOSTAT_OCCUPIED_COOLING_SETPOINT] = cool,
