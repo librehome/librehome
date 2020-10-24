@@ -1,6 +1,6 @@
 {
     "developer": "SmartonLabs",
-    "docsVersion": "20201024.10003.736.0",
+    "docsVersion": "20201024.10214.27.4",
     "documents": [
         {
             "locale": "en",
@@ -13,6 +13,6 @@
     ],
     "file": "LibreThermostat",
     "lang": "lua",
-    "signatureVersion": "20201006.214046.35.18",
-    "version": "20201006.214035.808.16"
+    "signatureVersion": "20201024.10214.25.3",
+    "version": "20201024.10147.193.1"
 }

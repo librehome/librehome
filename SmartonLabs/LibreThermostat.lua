@@ -1,6 +1,7 @@
 -- Copyright 2015-2020 Smartonlabs Inc
 -- Released under MIT License
 -- https://opensource.org/licenses/MIT
+-- Latest version: 20201023
 local pairs = pairs
 local ipairs = ipairs
 local error = error
