@@ -1,0 +1,14 @@
+{
+    "developer": "LibreHome",
+    "docsVersion": "20201218.211832.670.35",
+    "documents": [
+        {
+            "locale": "en",
+            "version": "20201218.211832.660.33"
+        }
+    ],
+    "file": "LpegQA",
+    "lang": "lua",
+    "signatureVersion": "20201218.211832.664.34",
+    "version": "20201218.211700.831.32"
+}
