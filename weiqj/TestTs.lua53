@@ -1,152 +1,130 @@
-declare class LightAndLevel {
-    @LibertasFieldUnique()
-    @LibertasFieldTableHeader()
-    @LibertasFieldDeviceTypes(
-        [
-            new LibertasDeviceType(LibertasDeviceLoadType.LOAD, 
-                LibertasDeviceId.ANY, [
-                    LibertasClusterId.GEN_LEVEL_CONTROL,
-                ]
-            ),
-        ]
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+local function HolidayLightShow(groups)
+    while true do
+        for ____, group in ipairs(groups) do
+            for ____, lightState in ipairs(group.lightStates) do
+                Libre_DeviceLevelSet(lightState.light, lightState.onLevel)
+            end
+            Libre_Wait(group.wait * 1000)
+        end
+    end
+end
+local function TestSimple()
+    print("hello world")
+end
+local function TestWeakSet()
+    local objweakSet = __TS__New(WeakSet, {{text = "hi"}})
+    local obj1 = {text = "hello"}
+    local obj2 = {text = "bye"}
+    objweakSet:add(obj1)
+    print(
+        objweakSet:has(obj1)
     )
-    light: LibertasDevice;
-    @LibertasFieldMin(0)
-    @LibertasFieldMax(255)
-    @LibertasFieldStep(1)
-    @LibertasFieldShowPercentage()
-    onLevel: number;
-}
-
-declare class LightGroup {
-    @LibertasFieldSizeMin(1)
-    @LibertasFieldUnordered()
-    lightStates: LightAndLevel[];
-    @LibertasFieldMin(0.001)
-    @LibertasFieldStep(0.001)
-    wait: number;
-}
-
-function HolidayLightShow(
-    @LibertasFieldSizeMin(1)
-    groups: LightGroup[]): void {
-    while (true) {
-        for (let group of groups) {
-            for (let lightState of group.lightStates) {
-                Libre_DeviceLevelSet(lightState.light, lightState.onLevel);
-            }
-            Libre_Wait(group.wait * 1000);
-        }
-    }
-}
-
-function TestSimple() {
-    console.log("hello world");
-}
-
-function TestWeakSet() {
-    const objweakSet = new WeakSet([{text:"hi"}]);
-    const obj1 = {text:"hello"};
-    const obj2 = {text:"bye"};
-    objweakSet.add(obj1); 
-    console.log(objweakSet.has(obj1)); 
-    console.log(objweakSet.has(obj2)); 
-    objweakSet.add(obj2); 
-    console.log(objweakSet.has(obj2));     
-}
-
-function getANumber() : number {
-    return 100;
-}
-
-function TestTimer() {
-    const t = Libre_TimerNew(1000, (tag, timer)=>{
-        console.log("TestTimer called.");
-        Libre_TimerUpdate(t, 1000);
-    }, undefined);
-    Libre_WaitReactive();
-}
-
-function testBuffer() {
-    const b = new lbuffer(100);
-    console.log("b:len()", b.length);
-    b[0] = 1;
-    console.log("b[0]=", b[0]);
-    b[0] = 2;
-    console.log("b[0]=", b[0]);
-    b[0] = 255;
-    console.log("b[0]=", b[0]);
-    b.set(1, "ABC");
-    console.log("b=", b[0], b[1], b[2], b[3]);
-    b.set(100, "ABC");
-    console.log("b:len()", b.length);
-    console.log("b=", b[100], b[101], b[1022], b[103]);
-}
-
-function TextRxHttpClient() {
-	const tag = {
-		step: 1,
-	}
-	
-    // HTTP client headers
-	const header: LibertasHttpHeader[] = [
-        ["Accept", "*/*"],
-		["User-Agent", "librehub/0.1"],
-    ]
-
-    const fd = Libre_NetNewHttp();
-    Libre_SetOnNetError(fd, (tag, fd, errCode, httpStatus, text)=>{
-        console.log(string.format(
-				'Error %s', text));
-		Libre_ExitThread()
-    }, tag);
-	Libre_SetOnNetHttpResponse(fd, (t, fd, res)=>{
-		console.log(string.format(
-				'statusCode %d', res.statusCode));
-		if (res.body) {
-			let length = res.body.length;
-			if (length > 100) {
-				length = 100
-			}
-			console.log(string.format(
-				'Respbody %s', res.body.substr(0, length)));
-		}
-		tag.step++;
-		if (tag.step == 2) {
-			Libre_NetHttpAddRequest(fd, 
-				"GET", 
-				"https://raw.githubusercontent.com/librehome/librehome/master/SmartonLabs/LibreApps.lua", 
-				header);
-        } else {
+    print(
+        objweakSet:has(obj2)
+    )
+    objweakSet:add(obj2)
+    print(
+        objweakSet:has(obj2)
+    )
+end
+local function getANumber()
+    return 100
+end
+local function TestTimer()
+    local t
+    t = Libre_TimerNew(
+        1000,
+        function(tag, timer)
+            print("TestTimer called.")
+            Libre_TimerUpdate(t, 1000)
+        end,
+        nil
+    )
+    Libre_WaitReactive()
+end
+local function testBuffer()
+    local b = lbuffer(100)
+    print(
+        "b:len()",
+        b:len()
+    )
+    b[1] = 1
+    print("b[0]=", b[1])
+    b[1] = 2
+    print("b[0]=", b[1])
+    b[1] = 255
+    print("b[0]=", b[1])
+    b:set(2, "ABC")
+    print("b=", b[1], b[2], b[3], b[4])
+    b:set(101, "ABC")
+    print(
+        "b:len()",
+        b:len()
+    )
+    print("b=", b[101], b[102], b[1023], b[104])
+end
+local function TextRxHttpClient()
+    local tag = {step = 1}
+    local header = {{"Accept", "*/*"}, {"User-Agent", "librehub/0.1"}}
+    local fd = Libre_NetNewHttp()
+    Libre_SetOnNetError(
+        fd,
+        function(tag, fd, errCode, httpStatus, text)
+            print(
+                string.format("Error %s", text)
+            )
             Libre_ExitThread()
-        }
-    }, tag);
-
-	Libre_NetHttpAddRequest(fd, 
-		"GET", 
-		"https://raw.githubusercontent.com/librehome/librehome/master/SmartonLabs/LibreDenonAVR.lua", 
-		header);
-	Libre_WaitReactive();
-}
-
-function TsTestThread() {
-    const t = function(a: number, b: number, c: number) {
-        console.log("a=", a);
-        Libre_Wait(5000);
-        console.log("b=", b);
-        Libre_Wait(5000);
-        console.log("c=", c);
-        Libre_Wait(5000);
-    }
-    Libre_NewThread(t, 1, 2, 3);
-}
-
-export {
-    HolidayLightShow, 
-    TestSimple, 
-    TestWeakSet, 
-    TestTimer, 
-    testBuffer, 
-    TextRxHttpClient,
-    TsTestThread,
-}
+        end,
+        tag
+    )
+    Libre_SetOnNetHttpResponse(
+        fd,
+        function(t, fd, res)
+            print(
+                string.format("statusCode %d", res.statusCode)
+            )
+            if res.body then
+                local length = #res.body
+                if length > 100 then
+                    length = 100
+                end
+                print(
+                    string.format(
+                        "Respbody %s",
+                        __TS__StringSubstr(res.body, 0, length)
+                    )
+                )
+            end
+            tag.step = tag.step + 1
+            if tag.step == 2 then
+                Libre_NetHttpAddRequest(fd, "GET", "https://raw.githubusercontent.com/librehome/librehome/master/SmartonLabs/LibreApps.lua", header)
+            else
+                Libre_ExitThread()
+            end
+        end,
+        tag
+    )
+    Libre_NetHttpAddRequest(fd, "GET", "https://raw.githubusercontent.com/librehome/librehome/master/SmartonLabs/LibreDenonAVR.lua", header)
+    Libre_WaitReactive()
+end
+local function TsTestThread()
+    local function t(a, b, c)
+        print("a=", a)
+        Libre_Wait(5000)
+        print("b=", b)
+        Libre_Wait(5000)
+        print("c=", c)
+        Libre_Wait(5000)
+    end
+    Libre_NewThread(t, 1, 2, 3)
+end
+____exports.HolidayLightShow = HolidayLightShow
+____exports.TestSimple = TestSimple
+____exports.TestWeakSet = TestWeakSet
+____exports.TestTimer = TestTimer
+____exports.testBuffer = testBuffer
+____exports.TextRxHttpClient = TextRxHttpClient
+____exports.TsTestThread = TsTestThread
+return ____exports
