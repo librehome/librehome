@@ -1,0 +1,18 @@
+{
+    "developer": "weiqj",
+    "docsVersion": "20210320.161331.39.3",
+    "documents": [
+        {
+            "locale": "en",
+            "version": "20210320.161331.24.1"
+        }
+    ],
+    "file": "TestTs",
+    "generated": [
+        "lua",
+        "lua53"
+    ],
+    "lang": "ts",
+    "signatureVersion": "20210320.161331.32.2",
+    "version": "20210320.153759.207.0"
+}
