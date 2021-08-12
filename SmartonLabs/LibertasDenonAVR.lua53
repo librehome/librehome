@@ -2,6 +2,7 @@
 local ____exports = {}
 local ENUM_SI = {"UNKNOWN", "PHONO", "CD", "TUNER", "DVD", "BD", "TV", "SAT/CBL", "MPLAY", "GAME", "HDRADIO", "NET", "PANDORA", "SIRIUSXM", "IRADIO", "SERVER", "FAVORITES", "AUX1", "AUX2", "AUX3", "AUX4", "AUX5", "AUX6", "AUX7", "BT", "USB/IPOD", "USB", "IPD", "IRP", "FVP"}
 local ENUM_ON_AUTO_OFF = {"ON", "AUTO", "OFF"}
+local ENUM_MS = {"UNKNOWN", "MOVIE", "MUSIC", "GAME", "DIRECT", "PURE DIRECT", "STEREO", "AUTO", "DOLBY PRO LOGIC", "DOLBY PL2 C", "DOLBY PL2 M", "DOLBY PL2 G", "DOLBY PL2X C", "DOLBY PL2X M", "DOLBY PL2X G", "DOLBY PL2Z H", "DOLBY SURROUND", "DOLBY ATMOS", "DOLBY DIGITAL", "DOLBY D EX", "DOLBY D+PL2X C", "DOLBY D+PL2X M", "DOLBY D+PL2Z H", "DOLBY D+DS", "DOLBY D+NEO:X C", "DOLBY D+NEO:X M", "DOLBY D+NEO:X G", "DOLBY D+NEURAL:X", "DTS SURROUND", "DTS ES DSCRT6.1", "DTS ES MTRX6.1", "DTS+PL2X C", "DTS+PL2X M", "DTS+PL2Z H", "DTS+DS", "DTS96/24", "DTS96 ES MTRX", "DTS+NEO:6", "DTS+NEO:X C", "DTS+NEO:X M", "DTS+NEO:X G", "DTS+NEURAL:X", "DTS ES MTRX+NEURAL:X", "DTS ES DSCRT+NEURAL:X", "MULTI CH IN", "M CH IN+DOLBY EX", "M CH IN+PL2X C", "M CH IN+PL2X M", "M CH IN+PL2Z H", "M CH IN+DS", "MULTI CH IN 7.1", "M CH IN+NEO:X C", "M CH IN+NEO:X M", "M CH IN+NEO:X G", "M CH IN+NEURAL:X", "DOLBY D+", "DOLBY D+ +EX", "DOLBY D+ +PL2X C", "DOLBY D+ +PL2X M", "DOLBY D+ +PL2Z H", "DOLBY D+ +DS", "DOLBY D+ +NEO:X C", "DOLBY D+ +NEO:X M", "DOLBY D+ +NEO:X G", "DOLBY D+ +NEURAL:X", "DOLBY HD", "DOLBY HD+EX", "DOLBY HD+PL2X C", "DOLBY HD+PL2X M", "DOLBY HD+PL2Z H", "DOLBY HD+DS", "DOLBY HD+NEO:X C", "DOLBY HD+NEO:X M", "DOLBY HD+NEO:X G", "DOLBY HD+NEURAL:X", "DTS HD", "DTS HD MSTR", "DTS HD+PL2X C", "DTS HD+PL2X M", "DTS HD+PL2Z H", "DTS HD+DS", "DTS HD+NEO:6", "DTS HD+NEO:X C", "DTS HD+NEO:X M", "DTS HD+NEO:X G", "DTS HD+NEURAL:X", "DTS:X", "DTS:X MSTR", "DTS EXPRESS", "DTS ES 8CH DSCRT", "MPEG2 AAC", "AAC+DOLBY EX", "AAC+PL2X C", "AAC+PL2X M", "AAC+PL2Z H", "AAC+DS", "AAC+NEO:X C", "AAC+NEO:X M", "AAC+NEO:X G", "AAC+NEURAL:X", "PL DSX", "PL2 C DSX", "PL2 M DSX", "PL2 G DSX", "PL2X C DSX", "PL2X M DSX", "PL2X G DSX", "AUDYSSEY DSX", "DTS NEO:6 C", "DTS NEO:6 M", "DTS NEO:X C", "DTS NEO:X M", "DTS NEO:X G", "NEURAL:X", "NEO:6 C DSX", "NEO:6 M DSX", "AURO3D", "AURO2DSURR", "MCH STEREO", "WIDE SCREEN", "SUPER STADIUM", "ROCK ARENA", "JAZZ CLUB", "CLASSIC CONCERT", "MONO MOVIE", "MATRIX", "VIDEO GAME", "VIRTUAL", "STEREO", "ALL ZONE STEREO", "7.1IN"}
 local AckAction = AckAction or ({})
 AckAction.NA = 0
 AckAction[AckAction.NA] = "NA"
@@ -143,6 +144,7 @@ local function DenonAVR(avr, mainZone, extraZones)
         local source = LibertasEventSource.MANUAL_LOCAL
         local isAck = ((pendingAck ~= nil) and (pendingAck.n == #cmd)) and __TS__StringStartsWith(pendingAck.c, cmd)
         if isAck then
+            suspectedUnsupportedCmd:delete(pendingAck.c)
             local ackAction = pendingAck.a
             if ackAction == AckAction.UPDATE then
                 shouldNotify = modified
@@ -197,6 +199,12 @@ local function DenonAVR(avr, mainZone, extraZones)
             cbUpdate(mainZone.input, cmd, v)
         end
     end
+    local function onMS(cmd, params)
+        local v = getEnumIndex(params, ENUM_MS, 1, 0)
+        if v ~= nil then
+            cbUpdate(mainZone.mode, cmd, v)
+        end
+    end
     local function onZM(cmd, params)
         local v = getBoolean(params)
         if v ~= nil then
@@ -236,8 +244,15 @@ local function DenonAVR(avr, mainZone, extraZones)
             cmd = tostring(cmd) .. "MU"
             v = false
         else
-            v = getEnumIndex(params, ENUM_SI, 1, 0)
-            d = extraZones[zone + 1].input
+            v = getEnumIndex(params, ENUM_SI, 1)
+            if v ~= nil then
+                d = extraZones[zone + 1].input
+            else
+                v = getEnumIndex(params, ENUM_MS, 1)
+                if v ~= nil then
+                    d = extraZones[zone + 1].mode
+                end
+            end
         end
         if (d ~= nil) and (v ~= nil) then
             cbUpdate(d, cmd, v)
@@ -256,6 +271,9 @@ local function DenonAVR(avr, mainZone, extraZones)
     end
     if mainZone.volume ~= nil then
         HANDLERS.MV = onMV
+    end
+    if mainZone.mode ~= nil then
+        HANDLERS.MS = onMS
     end
     local function onIncoming(c)
         if c == 13 then
@@ -354,6 +372,13 @@ local function DenonAVR(avr, mainZone, extraZones)
             outCmd = string.format("%sON\r", cmd)
         elseif event.d == LibertasCommand.OFF then
             outCmd = string.format("%sOFF\r", cmd)
+        elseif event.d == LibertasCommand.TOGGLE then
+            local curValue = deviceValues:get(event.id)
+            if curValue == nil then
+                curValue = false
+            end
+            local newValue = not curValue
+            outCmd = string.format("%s%s\r", cmd, (newValue and "ON") or "OFF")
         end
         return outCmd
     end
@@ -368,7 +393,7 @@ local function DenonAVR(avr, mainZone, extraZones)
             return
         end
         local attrs = event.v
-        local v = attrs[LibertasAttrId.IOV_BASIC_PRESENT_VALUE]
+        local v = attrs[(LibertasClusterId.GEN_MULTISTATE_INPUT_BASIC << 16) | LibertasAttrId.IOV_BASIC_PRESENT_VALUE]
         if v ~= nil then
             local val = values[v + 1]
             if val ~= nil then
@@ -402,6 +427,7 @@ local function DenonAVR(avr, mainZone, extraZones)
     end
     local function initSubZone(zone, cmd)
         initCtrlMap(zone.input, cmd, onControlEnum, zone.onOff, ENUM_SI)
+        initCtrlMap(zone.mode, cmd, onControlEnum, zone.onOff, ENUM_MS)
         initCtrlMap(
             zone.mute,
             tostring(cmd) .. "MU",
@@ -416,6 +442,7 @@ local function DenonAVR(avr, mainZone, extraZones)
     initCtrlMap(mainZone.mute, "MU", onControlOnOff, mainZone.onOff)
     initCtrlMap(mainZone.onOff, "ZM", onControlOnOff, mainZone.onOff)
     initCtrlMap(mainZone.volume, "MV", onControlVolume, mainZone.onOff)
+    initCtrlMap(mainZone.input, "MS", onControlEnum, mainZone.onOff, ENUM_MS)
     if #extraZones > 0 then
         initSubZone(extraZones[1], "Z2")
         if #extraZones > 1 then
@@ -438,12 +465,15 @@ local function DenonAVR(avr, mainZone, extraZones)
     initVolumeAttributes(mainZone.volume)
     initMultiStateAttributes(mainZone.input, #ENUM_SI, 1)
     initMultiStateAttributes(mainZone.eco, #ENUM_ON_AUTO_OFF)
+    initMultiStateAttributes(mainZone.mode, #ENUM_MS, 1)
     if #extraZones > 0 then
         initVolumeAttributes(extraZones[1].volume)
         initMultiStateAttributes(extraZones[1].input, #ENUM_SI, 1)
+        initMultiStateAttributes(extraZones[1].mode, #ENUM_MS, 1)
         if #extraZones > 1 then
             initVolumeAttributes(extraZones[2].volume)
             initMultiStateAttributes(extraZones[2].input, #ENUM_SI, 1)
+            initMultiStateAttributes(extraZones[2].mode, #ENUM_MS, 1)
         end
     end
     Libre_SetOnNetReady(
@@ -459,6 +489,7 @@ local function DenonAVR(avr, mainZone, extraZones)
             enqueuePendingMessages(mainZone.mute, "MU?\r", 2, AckAction.FORCE, LibertasEventSource.REPORT)
             enqueuePendingMessages(mainZone.input, "SI?\r", 2, AckAction.FORCE, LibertasEventSource.REPORT)
             enqueuePendingMessages(mainZone.eco, "ECO?\r", 3, AckAction.FORCE, LibertasEventSource.REPORT)
+            enqueuePendingMessages(mainZone.mode, "MS?\r", 2, AckAction.FORCE, LibertasEventSource.REPORT)
             if #extraZones > 0 then
                 enqueuePendingMessagesForce(nil, "Z2?\r", 2, AckAction.FORCE, LibertasEventSource.REPORT)
                 if #extraZones > 1 then

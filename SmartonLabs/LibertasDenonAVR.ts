@@ -41,6 +41,140 @@ const ENUM_ON_AUTO_OFF = [
 	'OFF'
 ];
 
+const ENUM_MS = [
+	'UNKNOWN',
+	'MOVIE',
+	'MUSIC',
+	'GAME',
+	'DIRECT',
+	'PURE DIRECT',
+	'STEREO',
+	'AUTO',
+	'DOLBY PRO LOGIC',
+	'DOLBY PL2 C',
+	'DOLBY PL2 M',
+	'DOLBY PL2 G',
+	'DOLBY PL2X C',
+	'DOLBY PL2X M',
+	'DOLBY PL2X G',
+	'DOLBY PL2Z H',
+	'DOLBY SURROUND',
+	'DOLBY ATMOS',
+	'DOLBY DIGITAL',
+	'DOLBY D EX',
+	'DOLBY D+PL2X C',
+	'DOLBY D+PL2X M',
+	'DOLBY D+PL2Z H',
+	'DOLBY D+DS',
+	'DOLBY D+NEO:X C',
+	'DOLBY D+NEO:X M',
+	'DOLBY D+NEO:X G',
+	'DOLBY D+NEURAL:X',
+	'DTS SURROUND',
+	'DTS ES DSCRT6.1',
+	'DTS ES MTRX6.1',
+	'DTS+PL2X C',
+	'DTS+PL2X M',
+	'DTS+PL2Z H',
+	'DTS+DS',
+	'DTS96/24',
+	'DTS96 ES MTRX',
+	'DTS+NEO:6',
+	'DTS+NEO:X C',
+	'DTS+NEO:X M',
+	'DTS+NEO:X G',
+	'DTS+NEURAL:X',
+	'DTS ES MTRX+NEURAL:X',
+	'DTS ES DSCRT+NEURAL:X',
+	'MULTI CH IN',
+	'M CH IN+DOLBY EX',
+	'M CH IN+PL2X C',
+	'M CH IN+PL2X M',
+	'M CH IN+PL2Z H',
+	'M CH IN+DS',
+	'MULTI CH IN 7.1',
+	'M CH IN+NEO:X C',
+	'M CH IN+NEO:X M',
+	'M CH IN+NEO:X G',
+	'M CH IN+NEURAL:X',
+	'DOLBY D+',
+	'DOLBY D+ +EX',
+	'DOLBY D+ +PL2X C',
+	'DOLBY D+ +PL2X M',
+	'DOLBY D+ +PL2Z H',
+	'DOLBY D+ +DS',
+	'DOLBY D+ +NEO:X C',
+	'DOLBY D+ +NEO:X M',
+	'DOLBY D+ +NEO:X G',
+	'DOLBY D+ +NEURAL:X',
+	'DOLBY HD',
+	'DOLBY HD+EX',
+	'DOLBY HD+PL2X C',
+	'DOLBY HD+PL2X M',
+	'DOLBY HD+PL2Z H',
+	'DOLBY HD+DS',
+	'DOLBY HD+NEO:X C',
+	'DOLBY HD+NEO:X M',
+	'DOLBY HD+NEO:X G',
+	'DOLBY HD+NEURAL:X',
+	'DTS HD',
+	'DTS HD MSTR',
+	'DTS HD+PL2X C',
+	'DTS HD+PL2X M',
+	'DTS HD+PL2Z H',
+	'DTS HD+DS',
+	'DTS HD+NEO:6',
+	'DTS HD+NEO:X C',
+	'DTS HD+NEO:X M',
+	'DTS HD+NEO:X G',
+	'DTS HD+NEURAL:X',
+	'DTS:X',
+	'DTS:X MSTR',
+	'DTS EXPRESS',
+	'DTS ES 8CH DSCRT',
+	'MPEG2 AAC',
+	'AAC+DOLBY EX',
+	'AAC+PL2X C',
+	'AAC+PL2X M',
+	'AAC+PL2Z H',
+	'AAC+DS',
+	'AAC+NEO:X C',
+	'AAC+NEO:X M',
+	'AAC+NEO:X G',
+	'AAC+NEURAL:X',
+	'PL DSX',
+	'PL2 C DSX',
+	'PL2 M DSX',
+	'PL2 G DSX',
+	'PL2X C DSX',
+	'PL2X M DSX',
+	'PL2X G DSX',
+	'AUDYSSEY DSX',
+	'DTS NEO:6 C',
+	'DTS NEO:6 M',
+	'DTS NEO:X C',
+	'DTS NEO:X M',
+	'DTS NEO:X G',
+	'NEURAL:X',
+	'NEO:6 C DSX',
+	'NEO:6 M DSX',
+	'AURO3D',
+	'AURO2DSURR',
+	'MCH STEREO',
+	'WIDE SCREEN',
+	'SUPER STADIUM',
+	'ROCK ARENA',
+	'JAZZ CLUB',
+	'CLASSIC CONCERT',
+	'MONO MOVIE',
+	'MATRIX',
+	'VIDEO GAME',
+	'VIRTUAL',
+	'STEREO',
+	'ALL ZONE STEREO',
+	'7.1IN'
+];
+
 declare class AVRMainZone {
     @LibertasFieldVirtualDeviceType(
         LibertasDeviceLoadType.LOAD,
@@ -69,6 +203,12 @@ declare class AVRMainZone {
         LibertasDeviceId.ON_OFF_SWITCH,
         [LibertasClusterId.GEN_ON_OFF])
     mute?: LibertasVirtualDevice;
+    @LibertasFieldVirtualDeviceType(
+        LibertasDeviceLoadType.LOAD,
+        LibertasDeviceId.GEN_MULTISTATE,
+        [LibertasClusterId.GEN_MULTISTATE_INPUT_BASIC])
+    @LibertasFieldEnum("ENUM_MS")
+    mode?: LibertasVirtualDevice;
 }
 
 declare class AVRExtraZone {
@@ -93,6 +233,12 @@ declare class AVRExtraZone {
         LibertasDeviceId.ON_OFF_SWITCH,
         [LibertasClusterId.GEN_ON_OFF])
     mute?: LibertasVirtualDevice;
+    @LibertasFieldVirtualDeviceType(
+        LibertasDeviceLoadType.LOAD,
+        LibertasDeviceId.GEN_MULTISTATE,
+        [LibertasClusterId.GEN_MULTISTATE_INPUT_BASIC])
+    @LibertasFieldEnum("ENUM_MS")
+    mode?: LibertasVirtualDevice;
 }
 
 enum AckAction {
@@ -269,6 +415,7 @@ function DenonAVR(
         let isAck = (pendingAck !== undefined && pendingAck.n === cmd.length &&
                 pendingAck.c.startsWith(cmd));
         if (isAck) {
+            suspectedUnsupportedCmd.delete(pendingAck!.c);  // It is a valid command
             const ackAction = pendingAck!.a
             if (ackAction === AckAction.UPDATE) {
                 shouldNotify = modified;
@@ -332,6 +479,13 @@ function DenonAVR(
         }
     }
 
+    function onMS(cmd: string, params: string) {
+        const v = getEnumIndex(params, ENUM_MS, 1, 0);
+        if (v !== undefined) {
+            cbUpdate(mainZone.mode!, cmd, v);
+        }
+    }
+
     function onZM(cmd: string, params: string) {
         const v = getBoolean(params);
         if (v !== undefined) {
@@ -376,8 +530,15 @@ function DenonAVR(
             cmd += "MU";
             v = false;
         } else {
-            v = getEnumIndex(params, ENUM_SI, 1, 0);
-            d = extraZones[zone].input;
+            v = getEnumIndex(params, ENUM_SI, 1);
+            if (v !== undefined) {
+                d = extraZones[zone].input;
+            } else {
+                v = getEnumIndex(params, ENUM_MS, 1);
+                if (v !== undefined) {
+                    d = extraZones[zone].mode;
+                }                
+            }
         }
         if (d !== undefined && v != undefined) {
             cbUpdate(d, cmd, v);
@@ -399,6 +560,9 @@ function DenonAVR(
     if (mainZone.volume !== undefined) {
         HANDLERS.set("MV", onMV);
     }
+    if (mainZone.mode !== undefined) {
+        HANDLERS.set("MS", onMS);
+    }    
 
     function onIncoming(c: number) {
         if (c == 0x0d) {    // '\r'
@@ -502,6 +666,13 @@ function DenonAVR(
             outCmd = string.format("%sON\r", cmd);
         } else if (event.d === LibertasCommand.OFF) {
             outCmd = string.format("%sOFF\r", cmd);
+        } else if (event.d === LibertasCommand.TOGGLE) {
+            let curValue = deviceValues.get(event.id);
+            if (curValue === undefined) {
+                curValue = false;
+            }
+            const newValue = !(curValue as boolean);
+            outCmd = string.format("%s%s\r", cmd, (newValue) ? "ON" : "OFF");
         }
         return outCmd;
     }
@@ -517,7 +688,7 @@ function DenonAVR(
             return;
         }
         const attrs = event.v as LibertasDeviceClusterAttributes;
-        const v = attrs[LibertasAttrId.IOV_BASIC_PRESENT_VALUE];
+        const v = attrs[LibertasClusterId.GEN_MULTISTATE_INPUT_BASIC << 16 | LibertasAttrId.IOV_BASIC_PRESENT_VALUE];
         if (v !== undefined) {
             const val = values![v as number];
             if (val !== undefined) {
@@ -562,6 +733,7 @@ function DenonAVR(
 
     function initSubZone(zone: AVRExtraZone, cmd: string) {
         initCtrlMap(zone.input, cmd, onControlEnum, zone.onOff, ENUM_SI);
+        initCtrlMap(zone.mode, cmd, onControlEnum, zone.onOff, ENUM_MS);
         initCtrlMap(zone.mute, cmd + "MU", onControlOnOff, zone.onOff);
         initCtrlMap(zone.onOff, cmd, onControlOnOff, zone.onOff);
         initCtrlMap(zone.volume, cmd, onControlVolume, zone.onOff);
@@ -571,6 +743,7 @@ function DenonAVR(
     initCtrlMap(mainZone.mute, "MU", onControlOnOff, mainZone.onOff);
     initCtrlMap(mainZone.onOff, "ZM", onControlOnOff, mainZone.onOff);
     initCtrlMap(mainZone.volume, "MV", onControlVolume, mainZone.onOff);
+    initCtrlMap(mainZone.input, "MS", onControlEnum, mainZone.onOff, ENUM_MS);
     if (extraZones.length > 0) {
         initSubZone(extraZones[0], "Z2");
         if (extraZones.length > 1) {
@@ -621,12 +794,15 @@ function DenonAVR(
     initVolumeAttributes(mainZone.volume);
     initMultiStateAttributes(mainZone.input, ENUM_SI.length, 1);
     initMultiStateAttributes(mainZone.eco, ENUM_ON_AUTO_OFF.length);
+    initMultiStateAttributes(mainZone.mode, ENUM_MS.length, 1);
     if (extraZones.length > 0) {
         initVolumeAttributes(extraZones[0].volume);
         initMultiStateAttributes(extraZones[0].input, ENUM_SI.length, 1);
+        initMultiStateAttributes(extraZones[0].mode, ENUM_MS.length, 1);
         if (extraZones.length > 1) {
             initVolumeAttributes(extraZones[1].volume);
             initMultiStateAttributes(extraZones[1].input, ENUM_SI.length, 1);
+            initMultiStateAttributes(extraZones[1].mode, ENUM_MS.length, 1);
         }
     }    
 
@@ -667,6 +843,12 @@ function DenonAVR(
             mainZone.eco,
             "ECO?\r",             
             3, 
+            AckAction.FORCE, 
+            LibertasEventSource.REPORT);
+        enqueuePendingMessages(
+            mainZone.mode,
+            "MS?\r",             
+            2, 
             AckAction.FORCE, 
             LibertasEventSource.REPORT);
         if (extraZones.length > 0) {
