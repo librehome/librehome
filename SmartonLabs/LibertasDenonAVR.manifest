@@ -1,6 +1,6 @@
 {
     "developer": "SmartonLabs",
-    "docsVersion": "20210812.342.734.3",
+    "docsVersion": "20210814.191427.801.3",
     "documents": [
         {
             "locale": "en",
@@ -17,6 +17,6 @@
         "lua53"
     ],
     "lang": "ts",
-    "signatureVersion": "20210812.342.726.2",
-    "version": "20210812.10.771.0"
+    "signatureVersion": "20210814.191427.793.2",
+    "version": "20210814.191200.487.0"
 }

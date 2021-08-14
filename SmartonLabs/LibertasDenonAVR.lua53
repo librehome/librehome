@@ -237,11 +237,11 @@ local function DenonAVR(avr, mainZone, extraZones)
             v = false
         elseif params == "MUON" then
             d = extraZones[zone + 1].mute
-            cmd = tostring(cmd) .. "MU"
+            cmd = cmd .. "MU"
             v = true
         elseif params == "MUOFF" then
             d = extraZones[zone + 1].mute
-            cmd = tostring(cmd) .. "MU"
+            cmd = cmd .. "MU"
             v = false
         else
             v = getEnumIndex(params, ENUM_SI, 1)
@@ -428,12 +428,7 @@ local function DenonAVR(avr, mainZone, extraZones)
     local function initSubZone(zone, cmd)
         initCtrlMap(zone.input, cmd, onControlEnum, zone.onOff, ENUM_SI)
         initCtrlMap(zone.mode, cmd, onControlEnum, zone.onOff, ENUM_MS)
-        initCtrlMap(
-            zone.mute,
-            tostring(cmd) .. "MU",
-            onControlOnOff,
-            zone.onOff
-        )
+        initCtrlMap(zone.mute, cmd .. "MU", onControlOnOff, zone.onOff)
         initCtrlMap(zone.onOff, cmd, onControlOnOff, zone.onOff)
         initCtrlMap(zone.volume, cmd, onControlVolume, zone.onOff)
     end
