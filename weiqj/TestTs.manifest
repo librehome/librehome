@@ -1,10 +1,14 @@
 {
     "developer": "weiqj",
-    "docsVersion": "20210321.15624.846.2",
+    "docsVersion": "20220124.225558.770.3",
     "documents": [
         {
             "locale": "en",
-            "version": "20210320.161331.24.1"
+            "version": "20220124.225558.736.0"
+        },
+        {
+            "locale": "zh_Hans",
+            "version": "20220124.225558.749.1"
         }
     ],
     "file": "TestTs",
@@ -13,6 +17,6 @@
         "lua53"
     ],
     "lang": "ts",
-    "signatureVersion": "20210321.15624.839.1",
-    "version": "20210320.163230.608.4"
+    "signatureVersion": "20220124.225558.752.2",
+    "version": "20220108.10417.693.1"
 }

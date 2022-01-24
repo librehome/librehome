@@ -64,6 +64,30 @@ local function testBuffer()
         b:len()
     )
     print("b=", b[101], b[102], b[1023], b[104])
+    local c = lbuffer("ABCDEFGHIJKLMN")
+    print(
+        c:tostring(1, 2)
+    )
+    print(
+        c:tostring(2, 2)
+    )
+    print(
+        c:tostring(3, 2)
+    )
+    c:set(3, "0123456789", 2, 5)
+    print(
+        c:tostring()
+    )
+    c = lbuffer("ABCDEFGHIJKLMN")
+    c:clear(2, 5)
+    print(
+        c:tostring()
+    )
+    c = lbuffer("ABCDEFGHIJKLMN")
+    c:remove(2, 5)
+    print(
+        c:tostring()
+    )
 end
 local function TextRxHttpClient()
     local tag = {step = 1}
@@ -110,15 +134,120 @@ local function TextRxHttpClient()
     Libre_WaitReactive()
 end
 local function TsTestThread()
-    local function t(a, b, c)
+    local function threadFunc(a, b, c)
         print("a=", a)
-        Libre_Wait(5000)
+        Libre_Wait(1000)
         print("b=", b)
-        Libre_Wait(5000)
+        Libre_Wait(1000)
         print("c=", c)
-        Libre_Wait(5000)
     end
-    Libre_NewThread(t, 1, 2, 3)
+    local tid = Libre_NewThread(threadFunc, 1, 2, 3)
+    Libre_ExitThread(tid)
+    Libre_ExitThread()
+end
+local function Imperative(aDevice, anotherDevice)
+    local timeout = 1000
+    local fd = 0
+    Libre_SetWaitDevice(aDevice)
+    Libre_SetWaitIo(fd, LibertasIOEventType.CAN_READ_WRITE)
+    while true do
+        Libre_Wait(timeout)
+        while true do
+            local event = Libre_GetEvent()
+            if event then
+            else
+                break
+            end
+        end
+    end
+end
+local function reactive(aDevice)
+    local tag = {}
+    local timeout = 1000
+    local fd = 0
+    Libre_SetOnDevice(
+        aDevice,
+        function(tag, event)
+        end,
+        tag
+    )
+    Libre_TimerNew(
+        timeout,
+        function(tag)
+        end
+    )
+    Libre_SetOnNetHttpResponse(
+        fd,
+        function(tag, fd, data)
+        end,
+        tag
+    )
+    Libre_WaitReactive()
+end
+local function deviceControl()
+    local device = 0
+    Libre_DeviceCommand(device, LibertasClusterId.GEN_ON_OFF, LibertasCommand.ON)
+    Libre_DeviceCommand(device, LibertasClusterId.GEN_LEVEL_CONTROL, LibertasCommand.LEVEL_MOVE_TO_LEVEL, {128, 20})
+    Libre_DeviceSetAttributes(device, LibertasClusterId.HVAC_THERMOSTAT, {[LibertasAttrId.HVAC_THERMOSTAT_SYSTEM_MODE] = LibertasThermostatMode.HEAT, [LibertasAttrId.HVAC_THERMOSTAT_OCCUPIED_HEATING_SETPOINT] = 2300})
+end
+local function TestMessage(recipients)
+    local now = os.date("%Y-%m-%d %H:%M:%S")
+    Libre_MessageText(LibertasMessageLevel.INFO, nil, recipients, "TEST_MESSAGE", now)
+    local temp = {type = "unit", unit = "Cel", value = 23}
+    Libre_MessageText(LibertasMessageLevel.INFO, nil, recipients, "TEMP_DISPLAY", temp)
+end
+local function VirtualSwitch(device)
+    Libre_SetOnVirtualDevice(
+        device,
+        function(tag, event)
+            if event.c == LibertasClusterId.GEN_ON_OFF then
+                if event.t == LibertasEventType.COMMAND then
+                    if (event.d == LibertasCommand.ON) or (event.d == LibertasCommand.OFF) then
+                        Libre_VirtualDeviceOnOffSet(device, event.d == LibertasCommand.ON, event.s)
+                    end
+                end
+            end
+        end
+    )
+    Libre_VirtualDeviceOnOffReport(device, false)
+end
+local function TestData()
+    local schema = {{type = "enum", name = "DayOfWeek", symbols = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}}, {type = "record", name = "TreeNode", fields = {{name = "value", type = "string"}, {name = "children", type = {"null", {type = "array", items = "TreeNode"}}}}}}
+    Libre_DataInitSchema(schema)
+    local tree = {value = "Root", children = {{value = "1-1", children = nil}, {value = "1-2", children = {{value = "2-1", children = nil}, {value = "2-2", children = nil}, {value = "2-3", children = nil}}}, {value = "1-3", children = nil}}}
+end
+local function TestData2()
+    local schema = {{type = "record", name = "TreeNode", fields = {{name = "value", type = "string"}, {name = "children", type = {"null", {type = "array", items = "TreeNode"}}}}}}
+    Libre_DataInitSchema(schema)
+    local dbTable = Libre_DataOpenTimeSeries("Data Table Name", true)
+    local treeRecord = {value = "Root", children = {{value = "1-1"}, {value = "1-2", children = {{value = "1-2-1"}, {value = "1-2-2"}, {value = "1-2-3"}}}, {value = "1-3"}}}
+    local index, timestamp = Libre_DataWriteTimeSeries(dbTable, treeRecord, "TreeNode")
+    local j = json.encode(schema)
+    local o = json.decode(j)
+    if o == json.null then
+    end
+    local xml = lom.encode(o)
+    local xmlO = lom.parse(xml)
+end
+local function TextHttpClient(url)
+    local header = {{"Accept", "*/*"}, {"User-Agent", "LibertasHub/1.0"}}
+    local fd = Libre_NetNewHttp()
+    Libre_SetOnNetError(
+        fd,
+        function(tag, fd, errCode, httpStatus, text)
+        end,
+        nil
+    )
+    Libre_SetOnNetHttpResponse(
+        fd,
+        function(t, fd, res)
+        end,
+        nil
+    )
+    Libre_NetHttpAddRequest(fd, "GET", url, header)
+    Libre_WaitReactive()
+end
+function ____exports.TestCircularRef(s)
 end
 ____exports.HolidayLightShow = HolidayLightShow
 ____exports.TestSimple = TestSimple
@@ -127,4 +256,8 @@ ____exports.TestTimer = TestTimer
 ____exports.testBuffer = testBuffer
 ____exports.TextRxHttpClient = TextRxHttpClient
 ____exports.TsTestThread = TsTestThread
+____exports.TestMessage = TestMessage
+____exports.Libre_DataWriteStandalone = Libre_DataWriteStandalone
+____exports.Libre_DataReadStandalone = Libre_DataReadStandalone
+____exports.Libre_DataEraseStandalone = Libre_DataEraseStandalone
 return ____exports
