@@ -68,7 +68,7 @@ function TestTimer() {
     Libre_WaitReactive();
 }
 
-function testBuffer() {
+function TestBuffer() {
     const b = new lbuffer(100);
     console.log("b:len()", b.length);
     b[0] = 1;
@@ -99,7 +99,7 @@ function testBuffer() {
     console.log(c.tostring());
 }
 
-function TextRxHttpClient() {
+function TestRxHttpClient() {
     const tag = {
         step: 1,
     }
@@ -145,7 +145,7 @@ function TextRxHttpClient() {
     Libre_WaitReactive();
 }
 
-function TsTestThread() {
+function TestThread() {
     const threadFunc = function (a: number, b: number, c: number) {
         console.log("a=", a);
         Libre_Wait(1000);
@@ -272,12 +272,6 @@ function VirtualSwitch(
     Libre_VirtualDeviceOnOffReport(device, false); // Set to "off" initially
 }
 
-declare function Libre_DataWriteStandalone(name: string, value: any): void;
-
-declare function Libre_DataReadStandalone(name: string): any;
-
-declare function Libre_DataEraseStandalone(name: string): void;
-
 function TestData() {
     interface TreeNode {
         value: string;
@@ -365,7 +359,7 @@ function TestData2() {
     const xmlO = lom.parse(xml);
 }
 
-function TextHttpClient(url: string) {
+function TestHttpClient(url: string) {
     const header: LibertasHttpHeader[] = [
         ["Accept", "*/*"],
         ["User-Agent", "LibertasHub/1.0"],
@@ -394,8 +388,8 @@ declare class NestB {
     a?: NestA;
 }
 
-export function TestCircularRef(s: NestA) {
-
+export function TestCircularRef(sa: NestA) {
+    console.log(sa);
 }
 
 export {
@@ -403,11 +397,8 @@ export {
     TestSimple,
     TestWeakSet,
     TestTimer,
-    testBuffer,
-    TextRxHttpClient,
-    TsTestThread,
+    TestBuffer,
+    TestRxHttpClient,
+    TestThread,
     TestMessage,
-    Libre_DataWriteStandalone,
-    Libre_DataReadStandalone,
-    Libre_DataEraseStandalone,
 }

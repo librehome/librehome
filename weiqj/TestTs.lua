@@ -18,16 +18,10 @@ local function TestWeakSet()
     local obj1 = {text = "hello"}
     local obj2 = {text = "bye"}
     objweakSet:add(obj1)
-    print(
-        objweakSet:has(obj1)
-    )
-    print(
-        objweakSet:has(obj2)
-    )
+    print(objweakSet:has(obj1))
+    print(objweakSet:has(obj2))
     objweakSet:add(obj2)
-    print(
-        objweakSet:has(obj2)
-    )
+    print(objweakSet:has(obj2))
 end
 local function getANumber()
     return 100
@@ -44,7 +38,7 @@ local function TestTimer()
     )
     Libre_WaitReactive()
 end
-local function testBuffer()
+local function TestBuffer()
     local b = lbuffer(100)
     print(
         "b:len()",
@@ -57,48 +51,46 @@ local function testBuffer()
     b[1] = 255
     print("b[0]=", b[1])
     b:set(2, "ABC")
-    print("b=", b[1], b[2], b[3], b[4])
+    print(
+        "b=",
+        b[1],
+        b[2],
+        b[3],
+        b[4]
+    )
     b:set(101, "ABC")
     print(
         "b:len()",
         b:len()
     )
-    print("b=", b[101], b[102], b[1023], b[104])
+    print(
+        "b=",
+        b[101],
+        b[102],
+        b[1023],
+        b[104]
+    )
     local c = lbuffer("ABCDEFGHIJKLMN")
-    print(
-        c:tostring(1, 2)
-    )
-    print(
-        c:tostring(2, 2)
-    )
-    print(
-        c:tostring(3, 2)
-    )
+    print(c:tostring(1, 2))
+    print(c:tostring(2, 2))
+    print(c:tostring(3, 2))
     c:set(3, "0123456789", 2, 5)
-    print(
-        c:tostring()
-    )
+    print(c:tostring())
     c = lbuffer("ABCDEFGHIJKLMN")
     c:clear(2, 5)
-    print(
-        c:tostring()
-    )
+    print(c:tostring())
     c = lbuffer("ABCDEFGHIJKLMN")
     c:remove(2, 5)
-    print(
-        c:tostring()
-    )
+    print(c:tostring())
 end
-local function TextRxHttpClient()
+local function TestRxHttpClient()
     local tag = {step = 1}
     local header = {{"Accept", "*/*"}, {"User-Agent", "librehub/0.1"}}
     local fd = Libre_NetNewHttp()
     Libre_SetOnNetError(
         fd,
         function(tag, fd, errCode, httpStatus, text)
-            print(
-                string.format("Error %s", text)
-            )
+            print(string.format("Error %s", text))
             Libre_ExitThread()
         end,
         tag
@@ -106,20 +98,16 @@ local function TextRxHttpClient()
     Libre_SetOnNetHttpResponse(
         fd,
         function(t, fd, res)
-            print(
-                string.format("statusCode %d", res.statusCode)
-            )
+            print(string.format("statusCode %d", res.statusCode))
             if res.body then
                 local length = #res.body
                 if length > 100 then
                     length = 100
                 end
-                print(
-                    string.format(
-                        "Respbody %s",
-                        __TS__StringSubstr(res.body, 0, length)
-                    )
-                )
+                print(string.format(
+                    "Respbody %s",
+                    __TS__StringSubstr(res.body, 0, length)
+                ))
             end
             tag.step = tag.step + 1
             if tag.step == 2 then
@@ -133,7 +121,7 @@ local function TextRxHttpClient()
     Libre_NetHttpAddRequest(fd, "GET", "https://raw.githubusercontent.com/librehome/librehome/master/SmartonLabs/LibreDenonAVR.lua", header)
     Libre_WaitReactive()
 end
-local function TsTestThread()
+local function TestThread()
     local function threadFunc(a, b, c)
         print("a=", a)
         Libre_Wait(1000)
@@ -192,9 +180,21 @@ local function deviceControl()
 end
 local function TestMessage(recipients)
     local now = os.date("%Y-%m-%d %H:%M:%S")
-    Libre_MessageText(LibertasMessageLevel.INFO, nil, recipients, "TEST_MESSAGE", now)
+    Libre_MessageText(
+        LibertasMessageLevel.INFO,
+        nil,
+        recipients,
+        "TEST_MESSAGE",
+        now
+    )
     local temp = {type = "unit", unit = "Cel", value = 23}
-    Libre_MessageText(LibertasMessageLevel.INFO, nil, recipients, "TEMP_DISPLAY", temp)
+    Libre_MessageText(
+        LibertasMessageLevel.INFO,
+        nil,
+        recipients,
+        "TEMP_DISPLAY",
+        temp
+    )
 end
 local function VirtualSwitch(device)
     Libre_SetOnVirtualDevice(
@@ -202,7 +202,7 @@ local function VirtualSwitch(device)
         function(tag, event)
             if event.c == LibertasClusterId.GEN_ON_OFF then
                 if event.t == LibertasEventType.COMMAND then
-                    if (event.d == LibertasCommand.ON) or (event.d == LibertasCommand.OFF) then
+                    if event.d == LibertasCommand.ON or event.d == LibertasCommand.OFF then
                         Libre_VirtualDeviceOnOffSet(device, event.d == LibertasCommand.ON, event.s)
                     end
                 end
@@ -212,7 +212,15 @@ local function VirtualSwitch(device)
     Libre_VirtualDeviceOnOffReport(device, false)
 end
 local function TestData()
-    local schema = {{type = "enum", name = "DayOfWeek", symbols = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}}, {type = "record", name = "TreeNode", fields = {{name = "value", type = "string"}, {name = "children", type = {"null", {type = "array", items = "TreeNode"}}}}}}
+    local schema = {{type = "enum", name = "DayOfWeek", symbols = {
+        "Sun",
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat"
+    }}, {type = "record", name = "TreeNode", fields = {{name = "value", type = "string"}, {name = "children", type = {"null", {type = "array", items = "TreeNode"}}}}}}
     Libre_DataInitSchema(schema)
     local tree = {value = "Root", children = {{value = "1-1", children = nil}, {value = "1-2", children = {{value = "2-1", children = nil}, {value = "2-2", children = nil}, {value = "2-3", children = nil}}}, {value = "1-3", children = nil}}}
 end
@@ -229,7 +237,7 @@ local function TestData2()
     local xml = lom.encode(o)
     local xmlO = lom.parse(xml)
 end
-local function TextHttpClient(url)
+local function TestHttpClient(url)
     local header = {{"Accept", "*/*"}, {"User-Agent", "LibertasHub/1.0"}}
     local fd = Libre_NetNewHttp()
     Libre_SetOnNetError(
@@ -247,17 +255,15 @@ local function TextHttpClient(url)
     Libre_NetHttpAddRequest(fd, "GET", url, header)
     Libre_WaitReactive()
 end
-function ____exports.TestCircularRef(s)
+function ____exports.TestCircularRef(sa)
+    print(sa)
 end
 ____exports.HolidayLightShow = HolidayLightShow
 ____exports.TestSimple = TestSimple
 ____exports.TestWeakSet = TestWeakSet
 ____exports.TestTimer = TestTimer
-____exports.testBuffer = testBuffer
-____exports.TextRxHttpClient = TextRxHttpClient
-____exports.TsTestThread = TsTestThread
+____exports.TestBuffer = TestBuffer
+____exports.TestRxHttpClient = TestRxHttpClient
+____exports.TestThread = TestThread
 ____exports.TestMessage = TestMessage
-____exports.Libre_DataWriteStandalone = Libre_DataWriteStandalone
-____exports.Libre_DataReadStandalone = Libre_DataReadStandalone
-____exports.Libre_DataEraseStandalone = Libre_DataEraseStandalone
 return ____exports
