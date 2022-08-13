@@ -1,0 +1,18 @@
+{
+    "developer": "LibertasTutorial",
+    "docsVersion": "20220812.21632.790.5",
+    "documents": [
+        {
+            "locale": "en",
+            "version": "20220812.21632.788.3"
+        }
+    ],
+    "file": "CircularReference",
+    "generated": [
+        "lua",
+        "lua54"
+    ],
+    "lang": "ts",
+    "signatureVersion": "20220812.21632.789.4",
+    "version": "20220811.184806.613.4"
+}
