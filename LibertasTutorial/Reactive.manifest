@@ -1,0 +1,18 @@
+{
+    "developer": "LibertasTutorial",
+    "docsVersion": "20220812.21917.617.23",
+    "documents": [
+        {
+            "locale": "en",
+            "version": "20220812.21917.617.21"
+        }
+    ],
+    "file": "Reactive",
+    "generated": [
+        "lua",
+        "lua54"
+    ],
+    "lang": "ts",
+    "signatureVersion": "20220812.21917.617.22",
+    "version": "20220811.185124.787.5"
+}
