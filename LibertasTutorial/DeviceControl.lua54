@@ -1,0 +1,9 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+function ____exports.deviceControl()
+    local device = 0
+    Libertas_DeviceCommand(device, 6, 1)
+    Libertas_DeviceCommand(device, 8, 0, {128, 20})
+    Libertas_DeviceSetAttributes(device, 513, {[28] = 4, [18] = 2300})
+end
+return ____exports

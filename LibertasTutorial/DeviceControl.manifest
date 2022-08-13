@@ -1,0 +1,18 @@
+{
+    "developer": "LibertasTutorial",
+    "docsVersion": "20220812.21711.952.11",
+    "documents": [
+        {
+            "locale": "en",
+            "version": "20220812.21711.951.9"
+        }
+    ],
+    "file": "DeviceControl",
+    "generated": [
+        "lua",
+        "lua54"
+    ],
+    "lang": "ts",
+    "signatureVersion": "20220812.21711.951.10",
+    "version": "20220811.182905.75.20"
+}
