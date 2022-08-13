@@ -1,0 +1,18 @@
+{
+    "developer": "LibertasTutorial",
+    "docsVersion": "20220812.21358.222.2",
+    "documents": [
+        {
+            "locale": "en",
+            "version": "20220812.21358.218.0"
+        }
+    ],
+    "file": "Buffer",
+    "generated": [
+        "lua",
+        "lua54"
+    ],
+    "lang": "ts",
+    "signatureVersion": "20220812.21358.221.1",
+    "version": "20220811.182513.668.17"
+}
