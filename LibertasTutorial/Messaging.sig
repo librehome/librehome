@@ -1,0 +1,1 @@
+{"Functions":[{"NativeName":"TestMessage", "Reserved":false, "Parameters":[{"ID":0, "NativeName":"recipients", "Type":"List", "BuiltinType":true, "Children":[{"ID":1, "NativeName":"", "Type":"User", "BuiltinType":true, "Attributes":[{"Name":"Unique", "Value":""}]}], "Attributes":[{"Name":"SizeMin", "Value":"1"},{"Name":"Unordered", "Value":""}]}]}], "Types":[]}
