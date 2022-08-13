@@ -197,15 +197,15 @@ local function getBoolean(value)
     end
 end
 local function virtualDeviceSendReport(device, value)
-    if Libertas_DeviceSupportsCluster(device, LibertasClusterId.GEN_LEVEL_CONTROL) then
-        local attributes = {[LibertasAttrId.LEVEL_CURRENT_LEVEL] = value}
-        Libertas_VirtualDeviceUpdate(device, LibertasClusterId.GEN_LEVEL_CONTROL, attributes, LibertasEventSource.REPORT)
-    elseif Libertas_DeviceSupportsCluster(device, LibertasClusterId.GEN_ON_OFF) then
-        local attributes = {[LibertasAttrId.ON_OFF] = value}
-        Libertas_VirtualDeviceUpdate(device, LibertasClusterId.GEN_ON_OFF, attributes, LibertasEventSource.REPORT)
-    elseif Libertas_DeviceSupportsCluster(device, LibertasClusterId.GEN_MULTISTATE_INPUT_BASIC) then
-        local attrs = {[LibertasAttrId.IOV_BASIC_PRESENT_VALUE] = value}
-        Libertas_VirtualDeviceUpdate(device, LibertasClusterId.GEN_MULTISTATE_INPUT_BASIC, attrs, LibertasEventSource.REPORT)
+    if Libertas_DeviceSupportsCluster(device, 8) then
+        local attributes = {[0] = value}
+        Libertas_VirtualDeviceUpdate(device, 8, attributes, 7)
+    elseif Libertas_DeviceSupportsCluster(device, 6) then
+        local attributes = {[0] = value}
+        Libertas_VirtualDeviceUpdate(device, 6, attributes, 7)
+    elseif Libertas_DeviceSupportsCluster(device, 18) then
+        local attrs = {[85] = value}
+        Libertas_VirtualDeviceUpdate(device, 18, attrs, 7)
     end
 end
 local function DenonAVR(avr, mainZone, extraZones)
@@ -299,7 +299,7 @@ local function DenonAVR(avr, mainZone, extraZones)
                 "ZM?\r",
                 2,
                 AckAction.NA,
-                LibertasEventSource.NA
+                0
             )
         end
     )
@@ -324,7 +324,7 @@ local function DenonAVR(avr, mainZone, extraZones)
         local oldValue = ____temp_0
         local modified = oldValue == nil or oldValue ~= value
         local shouldNotify = false
-        local source = LibertasEventSource.MANUAL_LOCAL
+        local source = 1
         local isAck = pendingAck ~= nil and pendingAck.n == #cmd and __TS__StringStartsWith(pendingAck.c, cmd)
         if isAck then
             suspectedUnsupportedCmd:delete(pendingAck.c)
@@ -348,28 +348,28 @@ local function DenonAVR(avr, mainZone, extraZones)
                 if oldValue == nil then
                     virtualDeviceSendReport(device, value)
                 else
-                    if Libertas_DeviceSupportsCluster(device, LibertasClusterId.GEN_LEVEL_CONTROL) then
+                    if Libertas_DeviceSupportsCluster(device, 8) then
                         local args = {value, 0}
                         Libertas_VirtualDeviceCommand(
                             device,
-                            LibertasClusterId.GEN_LEVEL_CONTROL,
-                            LibertasCommand.LEVEL_MOVE_TO_LEVEL_WITH_ON_OFF,
+                            8,
+                            4,
                             source,
                             args
                         )
-                    elseif Libertas_DeviceSupportsCluster(device, LibertasClusterId.GEN_ON_OFF) then
+                    elseif Libertas_DeviceSupportsCluster(device, 6) then
                         local args = {}
-                        local cmd = value and LibertasCommand.ON or LibertasCommand.OFF
+                        local cmd = value and 1 or 0
                         Libertas_VirtualDeviceCommand(
                             device,
-                            LibertasClusterId.GEN_ON_OFF,
+                            6,
                             cmd,
                             source,
                             args
                         )
-                    elseif Libertas_DeviceSupportsCluster(device, LibertasClusterId.GEN_MULTISTATE_INPUT_BASIC) then
-                        local attrs = {[LibertasAttrId.IOV_BASIC_PRESENT_VALUE] = value}
-                        Libertas_VirtualDeviceUpdate(device, LibertasClusterId.GEN_MULTISTATE_INPUT_BASIC, attrs, source)
+                    elseif Libertas_DeviceSupportsCluster(device, 18) then
+                        local attrs = {[85] = value}
+                        Libertas_VirtualDeviceUpdate(device, 18, attrs, source)
                     end
                 end
             end
@@ -524,36 +524,36 @@ local function DenonAVR(avr, mainZone, extraZones)
         end
     end
     local function onControlVolume(event, cmd)
-        if event.c ~= LibertasClusterId.GEN_LEVEL_CONTROL then
+        if event.c ~= 8 then
             return
         end
-        if event.t ~= LibertasEventType.COMMAND then
+        if event.t ~= 0 then
             return
         end
         local outCmd
         if cmd ~= nil and event.d ~= nil then
-            if event.d == LibertasCommand.LEVEL_STEP or event.d == LibertasCommand.LEVEL_STEP_WITH_ON_OFF then
+            if event.d == 2 or event.d == 6 then
                 local stepMode = getCmdParameter(event, 0)
                 local stepBy = getCmdParameter(event, 1)
                 local curValue = deviceValues:get(event.id)
                 if curValue == nil then
-                    if stepMode == LibertasLevelStep.UP then
+                    if stepMode == 0 then
                         outCmd = string.format("%sUP\r", cmd)
-                    elseif stepMode == LibertasLevelStep.DOWN then
+                    elseif stepMode == 1 then
                         outCmd = string.format("%sDOWN\r", cmd)
                     end
                 else
                     local newValue = curValue
-                    if stepMode == LibertasLevelStep.UP then
+                    if stepMode == 0 then
                         newValue = newValue + stepBy
-                    elseif stepMode == LibertasLevelStep.DOWN then
+                    elseif stepMode == 1 then
                         newValue = newValue - stepBy
                     end
                     if newValue >= 0 and newValue < 98 * 2 and newValue ~= curValue then
                         outCmd = genCmdVolume(cmd, newValue / 2)
                     end
                 end
-            elseif event.d == LibertasCommand.LEVEL_MOVE_TO_LEVEL or event.d == LibertasCommand.LEVEL_MOVE_TO_LEVEL_WITH_ON_OFF then
+            elseif event.d == 0 or event.d == 4 then
                 local level = getCmdParameter(event, 0)
                 outCmd = genCmdVolume(cmd, level / 2)
             end
@@ -561,18 +561,18 @@ local function DenonAVR(avr, mainZone, extraZones)
         end
     end
     local function onControlOnOff(event, cmd)
-        if event.c ~= LibertasClusterId.GEN_ON_OFF then
+        if event.c ~= 6 then
             return
         end
-        if event.t ~= LibertasEventType.COMMAND then
+        if event.t ~= 0 then
             return
         end
         local outCmd
-        if event.d == LibertasCommand.ON then
+        if event.d == 1 then
             outCmd = string.format("%sON\r", cmd)
-        elseif event.d == LibertasCommand.OFF then
+        elseif event.d == 0 then
             outCmd = string.format("%sOFF\r", cmd)
-        elseif event.d == LibertasCommand.TOGGLE then
+        elseif event.d == 2 then
             local curValue = deviceValues:get(event.id)
             if curValue == nil then
                 curValue = false
@@ -583,20 +583,17 @@ local function DenonAVR(avr, mainZone, extraZones)
         return outCmd
     end
     local function onControlEnum(event, cmd, values)
-        if event.c ~= LibertasClusterId.GEN_MULTISTATE_INPUT_BASIC then
+        if event.c ~= 18 then
             return
         end
-        if event.t ~= LibertasEventType.ATTR then
+        if event.t ~= 1 then
             return
         end
-        if event.s == LibertasEventSource.QUERY or event.s == LibertasEventSource.REPORT then
+        if event.s == 6 or event.s == 7 then
             return
         end
         local attrs = event.v
-        local v = attrs[bit.bor(
-            bit.lshift(LibertasClusterId.GEN_MULTISTATE_INPUT_BASIC, 16),
-            LibertasAttrId.IOV_BASIC_PRESENT_VALUE
-        )]
+        local v = attrs[18 << 16 | 85]
         if v ~= nil then
             local val = values[v + 1]
             if val ~= nil then
@@ -685,21 +682,21 @@ local function DenonAVR(avr, mainZone, extraZones)
     end
     local function initVolumeAttributes(device)
         if device ~= nil then
-            Libertas_VirtualDeviceUpdate(device, LibertasClusterId.LIBERTAS_LEVEL_CONFIG, {
-                [LibertasAttrId.LIBERTAS_LEVEL_MIN] = 0,
-                [LibertasAttrId.LIBERTAS_LEVEL_MAX] = 196,
-                [LibertasAttrId.LIBERTAS_LEVEL_STEP_ONLY] = true,
-                [LibertasAttrId.LIBERTAS_LEVEL_STEP_SINGLE] = 1,
-                [LibertasAttrId.LIBERTAS_LEVEL_STEP_REPEAT] = 3,
-                [LibertasAttrId.LIBERTAS_LEVEL_STEP_INTERVAL] = 5
-            }, LibertasEventSource.REPORT)
+            Libertas_VirtualDeviceUpdate(device, 64514, {
+                [1] = 0,
+                [0] = 196,
+                [2] = true,
+                [3] = 1,
+                [4] = 3,
+                [5] = 5
+            }, 7)
         end
     end
     local function initMultiStateAttributes(device, nStates, minState)
         if device ~= nil then
-            Libertas_VirtualDeviceUpdate(device, LibertasClusterId.GEN_MULTISTATE_INPUT_BASIC, {[LibertasAttrId.IOV_BASIC_NUM_OF_STATES] = nStates}, LibertasEventSource.REPORT)
+            Libertas_VirtualDeviceUpdate(device, 18, {[74] = nStates}, 7)
             if minState ~= nil and minState ~= 0 then
-                Libertas_VirtualDeviceUpdate(device, LibertasClusterId.LIBERTAS_HUB, {[LibertasAttrId.LIBERTAS_MULTISTATE_MIN] = minState}, LibertasEventSource.REPORT)
+                Libertas_VirtualDeviceUpdate(device, 64624, {[4] = minState}, 7)
             end
         end
     end
@@ -730,42 +727,42 @@ local function DenonAVR(avr, mainZone, extraZones)
                 "ZM?\r",
                 2,
                 AckAction.FORCE,
-                LibertasEventSource.REPORT
+                7
             )
             enqueuePendingMessages(
                 mainZone.volume,
                 "MV?\r",
                 2,
                 AckAction.FORCE,
-                LibertasEventSource.REPORT
+                7
             )
             enqueuePendingMessages(
                 mainZone.mute,
                 "MU?\r",
                 2,
                 AckAction.FORCE,
-                LibertasEventSource.REPORT
+                7
             )
             enqueuePendingMessages(
                 mainZone.input,
                 "SI?\r",
                 2,
                 AckAction.FORCE,
-                LibertasEventSource.REPORT
+                7
             )
             enqueuePendingMessages(
                 mainZone.eco,
                 "ECO?\r",
                 3,
                 AckAction.FORCE,
-                LibertasEventSource.REPORT
+                7
             )
             enqueuePendingMessages(
                 mainZone.mode,
                 "MS?\r",
                 2,
                 AckAction.FORCE,
-                LibertasEventSource.REPORT
+                7
             )
             if #extraZones > 0 then
                 enqueuePendingMessagesForce(
@@ -773,7 +770,7 @@ local function DenonAVR(avr, mainZone, extraZones)
                     "Z2?\r",
                     2,
                     AckAction.FORCE,
-                    LibertasEventSource.REPORT
+                    7
                 )
                 if #extraZones > 1 then
                     enqueuePendingMessagesForce(
@@ -781,7 +778,7 @@ local function DenonAVR(avr, mainZone, extraZones)
                         "Z3?\r",
                         2,
                         AckAction.FORCE,
-                        LibertasEventSource.REPORT
+                        7
                     )
                 end
             end

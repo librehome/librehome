@@ -279,15 +279,30 @@ function getBoolean(value: string): boolean | undefined {
 }
 
 function virtualDeviceSendReport(device: LibertasVirtualDevice, value: number|boolean) {
-    if (Libre_DeviceSupportsCluster(device, LibertasClusterId.GEN_LEVEL_CONTROL)) {
-        Libre_VirtualDeviceLevelReport(device, value as number);
-    } else if (Libre_DeviceSupportsCluster(device, LibertasClusterId.GEN_ON_OFF)) {
-        Libre_VirtualDeviceOnOffReport(device, value as boolean);
-    } else if (Libre_DeviceSupportsCluster(device, LibertasClusterId.GEN_MULTISTATE_INPUT_BASIC)) {
+    if (Libertas_DeviceSupportsCluster(device, LibertasClusterId.GEN_LEVEL_CONTROL)) {
+        const attributes: LibertasDeviceClusterAttributes = {
+            [LibertasAttrId.LEVEL_CURRENT_LEVEL]: value as number,
+        }
+        Libertas_VirtualDeviceUpdate(
+            device, 
+            LibertasClusterId.GEN_LEVEL_CONTROL,
+            attributes,
+            LibertasEventSource.REPORT);
+    } else if (Libertas_DeviceSupportsCluster(device, LibertasClusterId.GEN_ON_OFF)) {
+        const attributes: LibertasDeviceClusterAttributes = {
+            [LibertasAttrId.ON_OFF]: value as boolean,
+        }
+        Libertas_VirtualDeviceUpdate(
+            device, 
+            LibertasClusterId.GEN_ON_OFF,
+            attributes,
+            LibertasEventSource.REPORT);
+    } else if (Libertas_DeviceSupportsCluster(device, LibertasClusterId.GEN_MULTISTATE_INPUT_BASIC)) {
         const attrs: LibertasDeviceClusterAttributes = {
             [LibertasAttrId.IOV_BASIC_PRESENT_VALUE]: value
         }
-        Libre_VirtualDeviceSetAttributes(device, 
+        Libertas_VirtualDeviceUpdate(
+            device, 
             LibertasClusterId.GEN_MULTISTATE_INPUT_BASIC,
             attrs,
             LibertasEventSource.REPORT);
@@ -299,11 +314,10 @@ function DenonAVR(
     mainZone: AVRMainZone, 
     @LibertasFieldSizeMax(2)
     extraZones: AVRExtraZone[]): void {
-
     const curIncoming = new lbuffer();
     const unsupportedCmds = new Set<string>();
     const suspectedUnsupportedCmd = new Map<string, number>();
-    const socket = Libre_NetNewTcp();
+    const socket = Libertas_NetNewTcp();
     const deviceValues = new Map<LibertasVirtualDevice, number|boolean>();
     const validDevices = new Set<LibertasVirtualDevice>();
     // A zone cannot be controlled if it is powered off.
@@ -313,14 +327,14 @@ function DenonAVR(
     let validSession = false;   // Session is valid when the first ACK(ZM?) is received
 
     // Three timers
-    const reconnectTimer = Libre_TimerNew(0, 
+    const reconnectTimer = Libertas_TimerNew(0, 
         ()=>{
-            Libre_NetConnectDevice(socket, avr, 23);            
+            Libertas_NetConnectDevice(socket, avr, 23);            
         });
-    const commandAckTimer = Libre_TimerNew(0, ()=>{
+    const commandAckTimer = Libertas_TimerNew(0, ()=>{
             onError();
         });
-    const heartBeatTimer = Libre_TimerNew(0, 
+    const heartBeatTimer = Libertas_TimerNew(0, 
             ()=>{   // Use power on/off query as heartbeat
                 enqueuePendingMessagesForce(undefined, "ZM?\r", 2, AckAction.NA, LibertasEventSource.NA);
             }
@@ -342,14 +356,14 @@ function DenonAVR(
             reconnectTimeout = 100;     // reduce to 100ms
         }
         for (let device of validDevices) {
-            Libre_VirtualDeviceStatusDeviceDown(device);
+            Libertas_VirtualDeviceStatusDeviceDown(device);
         }
         deviceValues.clear();
-        Libre_NetClose(socket);     // Will reconnect later
-        Libre_TimerCancel(commandAckTimer);
-        Libre_TimerCancel(heartBeatTimer);
+        Libertas_NetClose(socket);     // Will reconnect later
+        Libertas_TimerCancel(commandAckTimer);
+        Libertas_TimerCancel(heartBeatTimer);
         ready = false;
-        Libre_TimerUpdate(reconnectTimer, reconnectTimeout);
+        Libertas_TimerUpdate(reconnectTimer, reconnectTimeout);
     }
 
     function enqueuePendingMessagesForce(
@@ -388,9 +402,9 @@ function DenonAVR(
     function rescheduleHeartbeat() {
         if (ready) {
             if (!pendingAck) {
-                Libre_TimerUpdate(heartBeatTimer, TIMEOUT_HB);
+                Libertas_TimerUpdate(heartBeatTimer, TIMEOUT_HB);
             } else {
-                Libre_TimerCancel(heartBeatTimer);
+                Libertas_TimerCancel(heartBeatTimer);
             }
         }
     }
@@ -399,8 +413,8 @@ function DenonAVR(
         if (ready && pendingAck === undefined) {
             pendingAck = pendingMessages.popleft();
             if (pendingAck) {
-                Libre_NetWrite(socket, pendingAck.c);
-                Libre_TimerUpdate(commandAckTimer, TIMEOUT_ACK);
+                Libertas_NetWrite(socket, pendingAck.c);
+                Libertas_TimerUpdate(commandAckTimer, TIMEOUT_ACK);
             }
             rescheduleHeartbeat();
         }
@@ -424,7 +438,7 @@ function DenonAVR(
             }
             source = pendingAck!.s;
             pendingAck = undefined;
-            Libre_TimerCancel(commandAckTimer);
+            Libertas_TimerCancel(commandAckTimer);
             validSession = true;
             trySendMessage();
         } else {    // For unsolicited commands, only notify on change
@@ -436,15 +450,29 @@ function DenonAVR(
                 if (oldValue === undefined) {   // Initial report
                     virtualDeviceSendReport(device, value);
                 } else {
-                    if (Libre_DeviceSupportsCluster(device, LibertasClusterId.GEN_LEVEL_CONTROL)) {
-                        Libre_VirtualDeviceLevelSet(device, value as number, source);
-                    } else if (Libre_DeviceSupportsCluster(device, LibertasClusterId.GEN_ON_OFF)) {
-                        Libre_VirtualDeviceOnOffSet(device, value as boolean, source);
-                    } else if (Libre_DeviceSupportsCluster(device, LibertasClusterId.GEN_MULTISTATE_INPUT_BASIC)) {
+                    if (Libertas_DeviceSupportsCluster(device, LibertasClusterId.GEN_LEVEL_CONTROL)) {
+                        const args: LibertasDeviceAttributeValue[] = [value as number, 0];
+                        Libertas_VirtualDeviceCommand(
+                            device, 
+                            LibertasClusterId.GEN_LEVEL_CONTROL,
+                            LibertasCommand.LEVEL_MOVE_TO_LEVEL_WITH_ON_OFF,
+                            source,
+                            args);
+                    } else if (Libertas_DeviceSupportsCluster(device, LibertasClusterId.GEN_ON_OFF)) {
+                        const args: LibertasDeviceAttributeValue[] = [];
+                        const cmd = (value as boolean) ? LibertasCommand.ON : LibertasCommand.OFF;
+                        Libertas_VirtualDeviceCommand(
+                            device, 
+                            LibertasClusterId.GEN_ON_OFF,
+                            cmd,
+                            source,
+                            args);
+                    } else if (Libertas_DeviceSupportsCluster(device, LibertasClusterId.GEN_MULTISTATE_INPUT_BASIC)) {
                         const attrs: LibertasDeviceClusterAttributes = {
                             [LibertasAttrId.IOV_BASIC_PRESENT_VALUE]: value
                         }
-                        Libre_VirtualDeviceSetAttributes(device, 
+                        Libertas_VirtualDeviceUpdate(
+                            device, 
                             LibertasClusterId.GEN_MULTISTATE_INPUT_BASIC,
                             attrs,
                             source);
@@ -563,7 +591,6 @@ function DenonAVR(
     if (mainZone.mode !== undefined) {
         HANDLERS.set("MS", onMS);
     }    
-
     function onIncoming(c: number) {
         if (c == 0x0d) {    // '\r'
             let cmd, params: string;
@@ -705,7 +732,7 @@ function DenonAVR(
             values?: string[]) {
         if (d !== undefined) {
             validDevices.add(d);
-            Libre_SetOnVirtualDevice(d, (_, event)=>{
+            Libertas_SetOnVirtualDevice(d, (_, event)=>{
                 // Received user control events
                 if (d !== depends) {    // Not controlling zone power
                     const dependentPower = deviceValues.get(depends);
@@ -753,7 +780,7 @@ function DenonAVR(
 
     function initVolumeAttributes(device: LibertasVirtualDevice | undefined) {
         if (device !== undefined) {
-            Libre_VirtualDeviceSetAttributes(
+            Libertas_VirtualDeviceUpdate(
                 device, 
                 LibertasClusterId.LIBERTAS_LEVEL_CONFIG,
                 {                                                       // LibertasDeviceClusterAttributes
@@ -772,7 +799,7 @@ function DenonAVR(
             nStates: number,
             minState?: number) {
         if (device !== undefined) {
-            Libre_VirtualDeviceSetAttributes(
+            Libertas_VirtualDeviceUpdate(
                 device, 
                 LibertasClusterId.GEN_MULTISTATE_INPUT_BASIC,
                 {
@@ -780,7 +807,7 @@ function DenonAVR(
                 },
                 LibertasEventSource.REPORT);
             if (minState !== undefined && minState !== 0) {
-                Libre_VirtualDeviceSetAttributes(
+                Libertas_VirtualDeviceUpdate(
                     device, 
                     LibertasClusterId.LIBERTAS_HUB,
                     {
@@ -806,7 +833,7 @@ function DenonAVR(
         }
     }    
 
-    Libre_SetOnNetReady(socket, (tag)=>{
+    Libertas_SetOnNetReady(socket, (tag)=>{
         // First reset
         curIncoming.setlen(0);
         pendingMessages = new LibertasList<PendingMessage>();
@@ -868,21 +895,21 @@ function DenonAVR(
             }
         }
     });
-    Libre_SetOnNetDrain(socket, ()=>{
+    Libertas_SetOnNetDrain(socket, ()=>{
         trySendMessage();
     });
-    Libre_SetOnNetError(socket, (tag, fd, errorType, errorCode, errorText)=>{
+    Libertas_SetOnNetError(socket, (tag, fd, errorType, errorCode, errorText)=>{
         onError();
     });
-    Libre_SetOnNetData(socket, (tag, fd, data)=>{
+    Libertas_SetOnNetData(socket, (tag, fd, data)=>{
         for (let i=0; i<data.length; i++) {
             onIncoming(data.charCodeAt(i));
         }
     });
-    Libre_NetSetConnectTimeout(socket, 10);
+    Libertas_NetSetConnectTimeout(socket, 10);
     // Kick start the TCP connection
-    Libre_NetConnectDevice(socket, avr, 23);
-    Libre_WaitReactive();
+    Libertas_NetConnectDevice(socket, avr, 23);
+    Libertas_WaitReactive();
 }
 
 export {DenonAVR}
