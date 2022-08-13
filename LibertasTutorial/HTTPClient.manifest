@@ -1,0 +1,18 @@
+{
+    "developer": "LibertasTutorial",
+    "docsVersion": "20220812.21739.198.14",
+    "documents": [
+        {
+            "locale": "en",
+            "version": "20220812.21739.197.12"
+        }
+    ],
+    "file": "HTTPClient",
+    "generated": [
+        "lua",
+        "lua54"
+    ],
+    "lang": "ts",
+    "signatureVersion": "20220812.21739.198.13",
+    "version": "20220811.181353.734.10"
+}

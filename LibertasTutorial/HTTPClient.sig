@@ -1,0 +1,1 @@
+{"Functions":[{"NativeName":"TestHttpClient", "Reserved":false, "Parameters":[{"ID":0, "NativeName":"url", "Type":"String", "BuiltinType":true}]}], "Types":[]}
