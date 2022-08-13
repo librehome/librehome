@@ -1,0 +1,1 @@
+{"Functions":[{"NativeName":"TestWeakSet", "Reserved":false, "Parameters":[]}], "Types":[]}

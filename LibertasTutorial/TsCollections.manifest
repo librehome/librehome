@@ -1,0 +1,18 @@
+{
+    "developer": "LibertasTutorial",
+    "docsVersion": "20220812.22044.9.36",
+    "documents": [
+        {
+            "locale": "en",
+            "version": "20220812.22044.9.34"
+        }
+    ],
+    "file": "TsCollections",
+    "generated": [
+        "lua",
+        "lua54"
+    ],
+    "lang": "ts",
+    "signatureVersion": "20220812.22044.9.35",
+    "version": "20220811.182745.237.19"
+}
