@@ -1,0 +1,18 @@
+{
+    "developer": "LibertasTutorial",
+    "docsVersion": "20220812.21759.639.17",
+    "documents": [
+        {
+            "locale": "en",
+            "version": "20220812.21759.637.15"
+        }
+    ],
+    "file": "LightShow",
+    "generated": [
+        "lua",
+        "lua54"
+    ],
+    "lang": "ts",
+    "signatureVersion": "20220812.21759.638.16",
+    "version": "20220811.184508.15.3"
+}
