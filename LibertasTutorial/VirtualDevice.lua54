@@ -1,0 +1,24 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+function ____exports.VirtualSwitch(device)
+    Libertas_SetOnVirtualDevice(
+        device,
+        function(tag, event)
+            if event.c == 6 then
+                if event.t == 0 then
+                    if event.d == 1 or event.d == 0 then
+                        Libertas_VirtualDeviceCommand(
+                            device,
+                            6,
+                            event.d,
+                            event.s,
+                            {}
+                        )
+                    end
+                end
+            end
+        end
+    )
+    Libertas_VirtualDeviceUpdate(device, 6, {[0] = false}, 7)
+end
+return ____exports

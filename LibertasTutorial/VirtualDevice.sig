@@ -1,0 +1,1 @@
+{"Functions":[{"NativeName":"VirtualSwitch", "Reserved":false, "Parameters":[{"ID":0, "NativeName":"device", "Type":"VirtualDevice", "BuiltinType":true, "Attributes":[{"Name":"VirtualDevice", "Value":"1,0,6"}]}]}], "Types":[]}
