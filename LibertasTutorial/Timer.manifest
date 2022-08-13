@@ -1,0 +1,18 @@
+{
+    "developer": "LibertasTutorial",
+    "docsVersion": "20220812.22018.606.33",
+    "documents": [
+        {
+            "locale": "en",
+            "version": "20220812.22018.605.31"
+        }
+    ],
+    "file": "Timer",
+    "generated": [
+        "lua",
+        "lua54"
+    ],
+    "lang": "ts",
+    "signatureVersion": "20220812.22018.605.32",
+    "version": "20220811.182652.678.18"
+}
